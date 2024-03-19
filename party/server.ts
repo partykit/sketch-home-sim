@@ -72,7 +72,7 @@ export default class WorldServer implements Party.Server {
         return {
           success: `Light with id <${light.id}> in room with id <${
             location.id
-          }> is now: ${light.state ? "on" : "off"}`,
+          }> is now: ${light.state.on ? "on" : "off"}`,
         };
       case "moveRobot":
         // Check for errors

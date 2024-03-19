@@ -64,6 +64,18 @@ const lookWithRobotFunction = new OpenAIFunction(
   z.object({}).describe("List the contents of the room the robot is in")
 );
 
+const haltFunction = new OpenAIFunction(
+  "halt",
+  "Stop operations because you've achieved the goal or can't go any further",
+  z
+    .object({
+      messageToUser: z
+        .string()
+        .describe("Report back to the user with a message"),
+    })
+    .describe("Stop operations and report back to the user")
+);
+
 export const intentFunction = new OpenAIFunction(
   "decideBestFunction",
   "Decide which function to call next based on how to best respond to the user",
@@ -75,6 +87,7 @@ export const intentFunction = new OpenAIFunction(
         toggleLightFunction.name,
         moveRobotFunction.name,
         lookWithRobotFunction.name,
+        haltFunction.name,
       ]),
     })
     .describe("Function to call")
@@ -84,4 +97,5 @@ export const allFunctions = [
   toggleLightFunction,
   moveRobotFunction,
   lookWithRobotFunction,
+  haltFunction,
 ];
