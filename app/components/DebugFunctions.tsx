@@ -36,6 +36,19 @@ export default function DebugFunctions({
     fetch("toggleLight", { lightId: light.value });
   };
 
+  const handleLookWithRobotSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    fetch("lookWithRobot", {});
+  };
+
+  const handleMoveRobotSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    const room = evt.currentTarget.elements.namedItem(
+      "room"
+    ) as HTMLSelectElement;
+    fetch("moveRobot", { destinationRoomId: room.value });
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <h2>Functions</h2>
@@ -52,10 +65,13 @@ export default function DebugFunctions({
         </select>
         <button type="submit">toggleLight</button>
       </form>
-      <form>
-        <button onClick={() => {} /* @TODO */}>lookWithRobot</button>
+      <form onSubmit={handleLookWithRobotSubmit}>
+        <button>lookWithRobot</button>
       </form>
-      <form style={{ display: "flex", gap: "0.5rem" }}>
+      <form
+        onSubmit={handleMoveRobotSubmit}
+        style={{ display: "flex", gap: "0.5rem" }}
+      >
         <select name="room">
           {DEBUG_ROOMS.map((room) => (
             <option key={room} value={room}>
@@ -63,7 +79,7 @@ export default function DebugFunctions({
             </option>
           ))}
         </select>
-        <button onClick={() => {} /* @TODO */}>moveRobot</button>
+        <button>moveRobot</button>
       </form>
       <div>Latest response: {response ? <pre>{response}</pre> : "None"}</div>
     </div>

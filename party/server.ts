@@ -42,6 +42,10 @@ export default class WorldServer implements Party.Server {
   }
 
   handleFunctionCall(fn: string, args: any) {
+    const robot = this.world.moveableItems.find((i) => i.type === "robot");
+    const robotLocation = this.world.locations.find(
+      (l) => l.id === robot?.location
+    );
     switch (fn) {
       case "toggleLight":
         // Get the location and the item to toggle using args.lightId
@@ -60,7 +64,59 @@ export default class WorldServer implements Party.Server {
             location.id
           }> is now: ${light.state ? "on" : "off"}`,
         };
-        break;
+      case "moveRobot":
+        // Check for errors
+        if (!robot) {
+          return { error: "No robot found" };
+        }
+        // Get the current location of the robot
+        if (!robotLocation) {
+          return { error: "Robot is in an unknown location" };
+        }
+        // Check if the destination is a valid exit
+        if (!robotLocation.exits.includes(args.destinationRoomId)) {
+          return {
+            error: `Destination room with ID <${args.destinationRoomId}> is not adjacent to current room with ID <${currentLocation.id}>`,
+          };
+        }
+        // Move the robot
+        robot.location = args.destinationRoomId;
+        return {
+          result: `Robot moved to room with ID <${args.destinationRoomId}>`,
+        };
+      case "lookWithRobot":
+        // Check for errors
+        if (!robot) {
+          return { error: "No robot found" };
+        }
+        // Get the current location of the robot
+        if (!robotLocation) {
+          return { error: "Robot is in an unknown location" };
+        }
+        // Is it dark? If so, return an error
+        const robotLocationLight = robotLocation.contents.find(
+          (i) => i.type === "light"
+        ) as FixedItemLight;
+        if (!robotLocationLight.state.on) {
+          return { error: "It's too dark to see anything" };
+        }
+        // Return the contents of the location including movable items
+        // The format is:
+        // ```The robot is in Hallway (ID <hallway>). It can see: Light (ID <hallway-light>), [etc]```
+        // The list of items includes fixed items and movable items (excluding the robot itself)
+        const fixedItems = robotLocation.contents;
+        const movableItems = this.world.moveableItems.filter(
+          (i) => i.location === robotLocation.id && i.id !== robot.id
+        );
+        return {
+          result: `The robot is in ${robotLocation.name} (ID <${
+            robotLocation.id
+          }>). It can see: ${fixedItems
+            .map((i) => `${i.name} (ID <${i.id}>)`)
+            .join(", ")}, ${movableItems
+            .map((i) => `${i.name} (ID <${i.id}>)`)
+            .join(", ")}`,
+        };
     }
   }
 }
