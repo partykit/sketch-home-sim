@@ -4,13 +4,25 @@ import { getChatCompletionResponse } from "./openai";
 import type { OpenAIMessage } from "./openai";
 
 export default class AssistantServer implements Party.Server {
+  instruction: string | null = null;
+
   constructor(readonly room: Party.Room) {}
 
-  onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-    // no-op
+  onMessage(message: string, conn: Party.Connection) {
+    const data = JSON.parse(message);
+    if (data.type === "instruct") {
+      this.instruction = data.instruction;
+      this.broadcastSync();
+    }
   }
 
-  async onRequest(req: Party.Request) {
+  broadcastSync() {
+    this.room.broadcast(
+      JSON.stringify({ type: "sync", state: { instruction: this.instruction } })
+    );
+  }
+
+  /*async onRequest(req: Party.Request) {
     if (req.method === "GET") {
       return Response.json(this.fn.getSignature());
     } else if (req.method === "POST") {
@@ -73,7 +85,7 @@ export default class AssistantServer implements Party.Server {
     }
 
     return new Response("Method not allowed", { status: 405 });
-  }
+  }*/
 }
 
 AssistantServer satisfies Party.Worker;

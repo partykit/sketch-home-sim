@@ -3,6 +3,9 @@
   "name": "sketch-home-sim",
   "main": "party/server.ts",
   "compatibilityDate": "2024-03-15",
+  "parties": {
+    "assistant": "party/assistant.ts"
+  },
   "serve": {
     "path": "public",
     "build": "app/client.tsx"
