@@ -16,15 +16,20 @@ export default class WorldServer implements Party.Server {
 
   async onRequest(req: Party.Request) {
     if (req.method === "POST") {
-      if (req.url.endsWith("/call")) {
-        const { fn, args } = (await req.json()) as any;
-
-        if (!(fn in allFunctions)) {
+      const path = new URL(req.url).pathname;
+      const body = await req.json();
+      if (path.endsWith("/call")) {
+        const { fn, args } = body as any;
+        console.log("fn", fn, "args", args);
+        if (!allFunctions.map((f) => f.name).includes(fn)) {
           return new Response("Unknown Function", { status: 500 });
         }
 
         const result = this.handleFunctionCall(fn, args);
 
+        this.room.broadcast(
+          JSON.stringify({ type: "sync", state: this.world })
+        );
         return new Response(JSON.stringify(result, null, 2));
       }
 

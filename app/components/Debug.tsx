@@ -1,8 +1,10 @@
 import { useState } from "react";
 import usePartySocket from "partysocket/react";
+import DebugWorld from "./DebugWorld";
+import DebugFunctions from "./DebugFunctions";
 import type { World } from "../../party/world";
 
-export default function World() {
+export default function Debug() {
   const [world, setWorld] = useState<World | null>(null);
 
   const socket = usePartySocket({
@@ -16,9 +18,10 @@ export default function World() {
   });
 
   return (
-    <div>
-      <h2>World</h2>
-      <pre>{JSON.stringify(world, null, 2)}</pre>
+    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+      <h1>Debug</h1>
+      <DebugFunctions host={socket.host} room={socket.room} />
+      <DebugWorld world={world} />
     </div>
   );
 }

@@ -1,9 +1,9 @@
-import World from "./components/World";
+import Debug from "./components/Debug";
 
 export default function App() {
   return (
     <main>
-      <World />
+      <Debug />
       <div>Controls @TODO</div>
     </main>
   );
