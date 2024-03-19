@@ -1,6 +1,8 @@
 import { useState } from "react";
 import usePartySocket from "partysocket/react";
 
+// Another example is:
+// tell me where my dog is. you'll know it's my dog when you see it
 const DEFAULT_INSTRUCTION = "turn on the light in the lounge";
 
 export default function Debug() {

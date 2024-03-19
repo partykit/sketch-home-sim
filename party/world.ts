@@ -21,7 +21,7 @@ type MoveableItem = {
   location: string;
 };
 
-type Location = {
+export type Location = {
   id: string;
   name: string;
   contents: FixedItem[];

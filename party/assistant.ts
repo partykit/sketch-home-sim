@@ -3,7 +3,7 @@ import { intentFunction, allFunctions } from "./functions";
 import { getChatCompletionResponse } from "./openai";
 import type { OpenAIMessage } from "./openai";
 
-const MAX_INSTRUCTIONS = 10;
+const MAX_INSTRUCTIONS = 20;
 
 export default class AssistantServer implements Party.Server {
   instruction: string | null = null;
