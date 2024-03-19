@@ -1,40 +1,53 @@
-# 🎈 sketch-home-sim
+# sketch-home-sim
 
-Welcome to the party, pal!
+## What is this?
 
-This is a [Partykit](https://partykit.io) project, which lets you create real-time collaborative applications with minimal coding effort.
+What you'll find here:
 
-This is the **React starter** which pairs a PartyKit server with a React client.
+- A simple simulation of a smart home system
+- An assistant that takes instructions from the user
+- The assistant using OpenAI function calling to interaction with the simulation, to achieve its goal
 
-Refer to our docs for more information: https://github.com/partykit/partykit/blob/main/README.md. For more help, reach out to us on [Discord](https://discord.gg/g5uqHQJc3z), [GitHub](https://github.com/partykit/partykit), or [Twitter](https://twitter.com/partykit_io).
+When you run the sim using `npm run dev` there's a web view:
 
-## Usage
+- Left side: A debug view that shows the entire world state (including information unavailable to the assistant, such as the location of movable items like pets and people)
+- Right side: The assistant view, including a text input for the user to give instructions, and a view of the assistant's current state (its transcript of messages with OpenAI)
 
-You can start developing by running `npm run dev` and opening [http://localhost:1999](http://localhost:1999) in your browser. When you're ready, you can deploy your application on to the PartyKit cloud with `npm run deploy`.
+## Navigating around the repo
 
-## Finding your way around
+Looking in `party/`...
 
-[`party/server.ts`](./party/server.ts) is the server-side code, which is responsible for handling WebSocket events and HTTP requests.
+There are two parties:
 
-It implements a simple counter that can be incremented by any connected client. The latest state is broadcast to all connected clients.
+- `server.ts` -- the world sim. Contains world state, and the endpoints for the assistant to interact with the world using functions. Includes a 'sync' WebSocket message so the debug view can see the world state
+- `assistant.ts` -- takes an instruction, and includes the function calling logic
 
-> [!NOTE]
-> The full Server API is available at [Party.Server in the PartyKit docs](https://docs.partykit.io/reference/partyserver-api/)
+There are also utility functions:
 
-[`app/client.tsx`](./src/client.ts) is the entrypoint to client-side code.
+- `openai.ts` -- communicates with OpenAI, constraining the response to a single tool call (tool == function)
+- `functions.ts` -- the functions that the assistant can call via OpenAI, including an `intentFunction` which is used to decide which actual function to call
+- `world.ts` and `messages.ts` -- types and constants
 
-[`app/components/Counter.tsx`](./src/components/Counter.tsx) connects to the server, sends `increment` events on the WebSocket, and listens for updates.
+## The function calling loop
 
-> [!NOTE]
-> The client-side reference can be found at [PartySocket in the PartyKit docs](https://docs.partykit.io/reference/partysocket-api/)
+When the assistant gets an instruction, it loops around the following steps:
 
-As a client-side React app, the app could be hosted every. During development, for convenience, the server serves the client-side code as well.
+- get the latest world state (the assistant always has access to the layout of the house, the devices in each rooms, and their current state. It does not have access to moveable items, i.e. un-networked pets and people)
+- call `intentFunction` using OpenAI to decide which function to call, given the user's instructions
+- call the decided function using OpenAI to get the function arguments
+- add this function call to the message transcript
+- (if the decided function is 'halt', stop here)
+- using the function name and arguments, make an HTTP request to the sim in `server.ts` to mutate the world state and get the result
+- adds the function call _result_ to the assistant's transcript -- this is essentially the assistant's memory, something that is additional to the world state.
 
-This is achieved with the optional `serve` property in the [`partykit.json`](./partykit.json) config file.
+The loop continues until:
 
-> [!NOTE]
-> Learn about PartyKit config under [Configuration in the PartyKit docs](https://docs.partykit.io/reference/partykit-configuration/)
+- the assistant receives a 'halt' function call -- this also includes the ability to report back to the user
+- the assistant hits the maximum number of function calls (currently set to 10)
 
-## Next Steps
+## Issues and next steps
 
-Learn about deploying PartyKit applications in the [Deployment guide of the PartyKit docs](https://docs.partykit.io/guides/deploying-your-partykit-server/).
+- The assistant isn't that smart... There's work to be done! World state probably shouldn't be in JSON
+- UI needs to be built
+- The function calling loop is cumbersome: what would be an idoimatic way to do this?
+- Real world integration: could the world sim represent _my house?_ Could the function calls be actual HomeKit calls?
