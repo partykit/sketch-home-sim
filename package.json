@@ -7,6 +7,7 @@
     "deploy": "partykit deploy"
   },
   "dependencies": {
+    "openai": "^4.29.0",
     "partysocket": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

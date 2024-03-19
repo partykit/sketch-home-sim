@@ -8,7 +8,7 @@ type OpenAIFunctionType = {
   getSignature: () => {
     name: string;
     description: string;
-    schema: any;
+    parameters: any;
   };
 };
 
@@ -31,7 +31,7 @@ class OpenAIFunction implements OpenAIFunctionType {
     return {
       name: this.name,
       description: this.description,
-      schema: zodToJsonSchema(this.schema, { target: "openApi3" }),
+      parameters: zodToJsonSchema(this.schema, { target: "openApi3" }),
     };
   }
 }
@@ -39,7 +39,49 @@ class OpenAIFunction implements OpenAIFunctionType {
 const toggleLightFunction = new OpenAIFunction(
   "toggleLight",
   "Toggle the light in a room, making it light or dark. You can see what's in a room when it's light.",
-  z.object({
-    lightId: z.string(),
-  })
+  z
+    .object({
+      lightId: z.string().describe("ID of the light to toggle"),
+    })
+    .describe("Toggle light")
 );
+
+const moveRobotFunction = new OpenAIFunction(
+  "moveRobot",
+  "Move the robot to an adjacent room. The robot can only move to rooms that are connected to its current location by an exit.",
+  z
+    .object({
+      destinationRoomId: z
+        .string()
+        .describe("ID of the adjacent room to move the robot to"),
+    })
+    .describe("Move robot")
+);
+
+const lookWithRobotFunction = new OpenAIFunction(
+  "lookWithRobot",
+  "Look into the robot's current room, returning the fixed and moving items (only if the room is light).",
+  z.object({}).describe("List the contents of the room the robot is in")
+);
+
+export const intentFunction = new OpenAIFunction(
+  "decideBestFunction",
+  "Decide which function to call next based on how to best respond to the user",
+
+  z
+    .object({
+      reasoning: z.string(),
+      bestFunction: z.enum([
+        toggleLightFunction.name,
+        moveRobotFunction.name,
+        lookWithRobotFunction.name,
+      ]),
+    })
+    .describe("Function to call")
+);
+
+export const allFunctions = [
+  toggleLightFunction,
+  moveRobotFunction,
+  lookWithRobotFunction,
+];

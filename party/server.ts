@@ -1,6 +1,7 @@
 import type * as Party from "partykit/server";
 import { DEFAULT_WORLD } from "./world";
-import type { World } from "./world";
+import type { World, FixedItemLight } from "./world";
+import { allFunctions } from "./functions";
 
 export default class WorldServer implements Party.Server {
   world: World = DEFAULT_WORLD;
@@ -13,8 +14,49 @@ export default class WorldServer implements Party.Server {
 
   onMessage(message: string, sender: Party.Connection) {}
 
-  onRequest(req: Party.Request) {
-    return new Response(JSON.stringify({ world: this.world }, null, 2));
+  async onRequest(req: Party.Request) {
+    if (req.method === "POST") {
+      if (req.url.endsWith("/call")) {
+        const { fn, args } = (await req.json()) as any;
+
+        if (!(fn in allFunctions)) {
+          return new Response("Unknown Function", { status: 500 });
+        }
+
+        const result = this.handleFunctionCall(fn, args);
+
+        return new Response(JSON.stringify(result, null, 2));
+      }
+
+      return new Response("Not Found", { status: 404 });
+    } else if (req.method === "GET") {
+      return new Response(JSON.stringify({ world: this.world }, null, 2));
+    }
+
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  handleFunctionCall(fn: string, args: any) {
+    switch (fn) {
+      case "toggleLight":
+        // Get the location and the item to toggle using args.lightId
+        const location = this.world.locations.find((l) =>
+          l.contents.some((i) => i.type === "light" && i.id === args.lightId)
+        );
+        if (!location) {
+          return { error: "No light found with that ID" };
+        }
+        const light = location.contents.find(
+          (i) => i.type === "light" && i.id === args.lightId
+        ) as FixedItemLight;
+        light.state.on = !light.state.on;
+        return {
+          result: `Light with id <${light.id}> in room with id <${
+            location.id
+          }> is now: ${light.state ? "on" : "off"}`,
+        };
+        break;
+    }
   }
 }
 

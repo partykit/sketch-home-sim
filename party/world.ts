@@ -9,7 +9,7 @@ type FixedItem = {
   state: any;
 };
 
-type FixedItemLight = FixedItem & {
+export type FixedItemLight = FixedItem & {
   type: "light";
   state: { on: boolean };
 };
