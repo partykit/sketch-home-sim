@@ -1,14 +1,26 @@
-import type { Location } from "../../party/world";
+import type { Location, MoveableItem } from "../../party/world";
 
-export default function DebugLocation({ location }: { location: Location }) {
+export default function DebugLocation({
+  location,
+  moveableItems,
+}: {
+  location: Location;
+  moveableItems: MoveableItem[];
+}) {
+  // Make list of all items in location with type 'light'
+  const lights = location.contents.filter((item) => item.type === "light");
+  // Do any of the lights have state.on === true?
+  const isLit = lights.some((light) => light.state.on);
+
   return (
     <div
       style={{
         width: "100%",
-        maxWidth: "14rem",
+        maxWidth: "12rem",
         border: "1px solid #666",
         borderRadius: "0.25rem",
         padding: "0.5rem",
+        background: isLit ? "#ffc" : "#cce",
       }}
     >
       <h2>{location.name}</h2>
@@ -33,6 +45,20 @@ export default function DebugLocation({ location }: { location: Location }) {
           </li>
         ))}
       </ul>
+      {moveableItems.length > 0 && (
+        <>
+          <h4>Moveable Items</h4>
+          <ul>
+            {moveableItems.map((item) => (
+              <li key={item.id}>
+                <strong>{item.name}</strong> <code>&lt;{item.id}&gt;</code>
+                <br />
+                type: <code>{item.type}</code>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }

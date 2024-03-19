@@ -55,7 +55,15 @@ export default function Debug() {
       </form>
       <div>
         <h2>Assistant State</h2>
-        <pre>{JSON.stringify(assistant, null, 2)}</pre>
+        <pre
+          style={{
+            overflowX: "auto",
+            whiteSpace: "pre-wrap",
+            wordWrap: "break-word",
+          }}
+        >
+          {JSON.stringify(assistant, null, 2)}
+        </pre>
       </div>
     </div>
   );

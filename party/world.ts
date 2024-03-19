@@ -14,7 +14,7 @@ export type FixedItemLight = FixedItem & {
   state: { on: boolean };
 };
 
-type MoveableItem = {
+export type MoveableItem = {
   id: string;
   name: string;
   type: MoveableItemType;
