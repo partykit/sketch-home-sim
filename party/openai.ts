@@ -42,7 +42,17 @@ export async function getChatCompletionResponse({
 
   console.log("response", JSON.stringify(response, null, 2));
 
-  let tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[] = [];
+  // Reply with the first message that includes a tool call
+  const toolCallMessage = response.choices.find(
+    (choice) => choice.message.tool_calls
+  );
+  if (toolCallMessage) {
+    return toolCallMessage.message as OpenAI.Chat.Completions.ChatCompletionMessage;
+  }
+
+  return;
+
+  /*let tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[] = [];
   let response_messages: OpenAI.Chat.Completions.ChatCompletionMessage[] = [];
   response.choices.map((choice) => {
     if (choice.message.tool_calls) {
@@ -55,5 +65,5 @@ export async function getChatCompletionResponse({
 
   // Ignore response_messages
   //return { response_messages, tool_calls };
-  return tool_calls;
+  return tool_calls;*/
 }

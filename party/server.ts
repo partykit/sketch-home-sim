@@ -15,8 +15,9 @@ export default class WorldServer implements Party.Server {
   onMessage(message: string, sender: Party.Connection) {}
 
   async onRequest(req: Party.Request) {
+    const path = new URL(req.url).pathname;
+
     if (req.method === "POST") {
-      const path = new URL(req.url).pathname;
       const body = await req.json();
       if (path.endsWith("/call")) {
         const { fn, args } = body as any;
@@ -35,7 +36,16 @@ export default class WorldServer implements Party.Server {
 
       return new Response("Not Found", { status: 404 });
     } else if (req.method === "GET") {
-      return new Response(JSON.stringify({ world: this.world }, null, 2));
+      if (path.endsWith("/debug")) {
+        return new Response(JSON.stringify({ world: this.world }, null, 2));
+      } else if (path.endsWith("/world")) {
+        // A static version of this.world which omits moveableItems
+        return new Response(
+          JSON.stringify({ world: this.world.locations }, null, 2)
+        );
+      }
+
+      return new Response("Not Found", { status: 404 });
     }
 
     return new Response("Method Not Allowed", { status: 405 });
@@ -60,7 +70,7 @@ export default class WorldServer implements Party.Server {
         ) as FixedItemLight;
         light.state.on = !light.state.on;
         return {
-          result: `Light with id <${light.id}> in room with id <${
+          success: `Light with id <${light.id}> in room with id <${
             location.id
           }> is now: ${light.state ? "on" : "off"}`,
         };
@@ -82,7 +92,7 @@ export default class WorldServer implements Party.Server {
         // Move the robot
         robot.location = args.destinationRoomId;
         return {
-          result: `Robot moved to room with ID <${args.destinationRoomId}>`,
+          success: `Robot moved to room with ID <${args.destinationRoomId}>`,
         };
       case "lookWithRobot":
         // Check for errors
@@ -109,7 +119,7 @@ export default class WorldServer implements Party.Server {
           (i) => i.location === robotLocation.id && i.id !== robot.id
         );
         return {
-          result: `The robot is in ${robotLocation.name} (ID <${
+          success: `The robot is in ${robotLocation.name} (ID <${
             robotLocation.id
           }>). It can see: ${fixedItems
             .map((i) => `${i.name} (ID <${i.id}>)`)

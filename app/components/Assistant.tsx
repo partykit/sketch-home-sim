@@ -1,9 +1,11 @@
 import { useState } from "react";
 import usePartySocket from "partysocket/react";
 
+const DEFAULT_INSTRUCTION = "turn on the light in the lounge";
+
 export default function Debug() {
   const [assistant, setAssistant] = useState<any>(null);
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>(DEFAULT_INSTRUCTION);
 
   const socket = usePartySocket({
     party: "assistant",
