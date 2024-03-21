@@ -86,6 +86,18 @@ export default function Debug() {
         />
         <button type="submit">Instruct</button>
       </form>
+      {!assistant && (
+        <div>
+          <h2>Try these examples</h2>
+          <ul>
+            <li>turn on the light in the kitchen</li>
+            <li>turn off all the lights</li>
+            <li>turn on the light for sally</li>
+            <li>find my dog</li>
+            <li>turn the lights in the office to something appropriate</li>
+          </ul>
+        </div>
+      )}
       {assistant && (
         <>
           <div>
@@ -101,6 +113,17 @@ export default function Debug() {
                 <span>Working...</span>
               )}
             </p>
+            {messageToUser && (
+              <p>
+                <a
+                  href="#"
+                  style={{ color: "blue", textDecoration: "underline" }}
+                  onClick={() => setAssistant(null)}
+                >
+                  Reset
+                </a>
+              </p>
+            )}
           </div>
           <div style={{ flexGrow: 1 }}>
             <h2>Activity</h2>
