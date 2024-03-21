@@ -46,3 +46,8 @@ main > div {
   padding: 1rem;
   max-width: 50%;
 }
+
+code {
+  font-family: monospace;
+  font-size: 0.85em;
+}

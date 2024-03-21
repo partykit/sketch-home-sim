@@ -27,6 +27,29 @@ export default function Debug() {
     setInput("");
   };
 
+  // If the final message in the assistant.transcript...
+  // - has .role === assistant
+  // - has .tool_calls
+  // - has .tool_calls[0].function.name === "halt"
+  // then the assistant has finished its task. So parse:
+  // `.tool_calls[0].function.arguments` and get the value of 'messageToUser'
+  let messageToUser = null;
+  if (
+    assistant && // if assistant is not null
+    assistant.transcript && // if assistant.transcript is not null
+    assistant.transcript.length > 0
+  ) {
+    const last = assistant.transcript[assistant.transcript.length - 1];
+    if (
+      last.role === "assistant" &&
+      last.tool_calls &&
+      last.tool_calls[0].function.name === "halt"
+    ) {
+      const payload = JSON.parse(last.tool_calls[0].function.arguments);
+      messageToUser = payload.messageToUser;
+    }
+  }
+
   return (
     <div
       style={{
@@ -57,7 +80,18 @@ export default function Debug() {
       {assistant && (
         <>
           <div>
-            <h2>Assistant State</h2>
+            <h2>Interaction</h2>
+            {messageToUser !== null ? (
+              <p>
+                Assistant:{" "}
+                <span style={{ color: "green" }}>{messageToUser}</span>
+              </p>
+            ) : (
+              <p>Working...</p>
+            )}
+          </div>
+          <div>
+            <h2>Activity</h2>
             <p>
               <strong>Instruction:</strong> {assistant?.instruction}
             </p>

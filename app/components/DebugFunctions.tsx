@@ -50,38 +50,48 @@ export default function DebugFunctions({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <h2>Functions</h2>
-      <form
-        onSubmit={handleToggleLightSubmit}
-        style={{ display: "flex", gap: "0.5rem" }}
+    <details>
+      <summary
+        style={{
+          fontSize: "1.25rem",
+          fontWeight: "bold",
+          marginBottom: "1rem",
+        }}
       >
-        <select name="light">
-          {DEBUG_LIGHTS.map((light) => (
-            <option key={light} value={light}>
-              {light}
-            </option>
-          ))}
-        </select>
-        <button type="submit">toggleLight</button>
-      </form>
-      <form onSubmit={handleLookWithRobotSubmit}>
-        <button>lookWithRobot</button>
-      </form>
-      <form
-        onSubmit={handleMoveRobotSubmit}
-        style={{ display: "flex", gap: "0.5rem" }}
-      >
-        <select name="room">
-          {DEBUG_ROOMS.map((room) => (
-            <option key={room} value={room}>
-              {room}
-            </option>
-          ))}
-        </select>
-        <button>moveRobot</button>
-      </form>
-      <div>Latest response: {response ? <pre>{response}</pre> : "None"}</div>
-    </div>
+        Functions
+      </summary>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <form
+          onSubmit={handleToggleLightSubmit}
+          style={{ display: "flex", gap: "0.5rem" }}
+        >
+          <select name="light">
+            {DEBUG_LIGHTS.map((light) => (
+              <option key={light} value={light}>
+                {light}
+              </option>
+            ))}
+          </select>
+          <button type="submit">toggleLight</button>
+        </form>
+        <form onSubmit={handleLookWithRobotSubmit}>
+          <button>lookWithRobot</button>
+        </form>
+        <form
+          onSubmit={handleMoveRobotSubmit}
+          style={{ display: "flex", gap: "0.5rem" }}
+        >
+          <select name="room">
+            {DEBUG_ROOMS.map((room) => (
+              <option key={room} value={room}>
+                {room}
+              </option>
+            ))}
+          </select>
+          <button>moveRobot</button>
+        </form>
+        <div>Latest response: {response ? <pre>{response}</pre> : "None"}</div>
+      </div>
+    </details>
   );
 }

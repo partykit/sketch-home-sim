@@ -5,6 +5,13 @@ export default function AssistantTranscriptEntry({
 }: {
   entry: OpenAIMessage;
 }) {
+  let payload = null;
+  if (entry.role === "assistant" && entry.tool_calls) {
+    payload = JSON.parse(entry.tool_calls[0].function.arguments);
+  } else if (entry.role === "tool") {
+    payload = JSON.parse(entry.content);
+  }
+
   return (
     <div
       style={{
@@ -28,15 +35,18 @@ export default function AssistantTranscriptEntry({
       >
         {entry.role}
       </div>
-      <pre
-        style={{
-          overflowX: "auto",
-          whiteSpace: "pre-wrap",
-          wordWrap: "break-word",
-        }}
-      >
-        {JSON.stringify(entry, null, 2)}
-      </pre>
+      {entry.role === "assistant" && entry.tool_calls && (
+        <div>
+          {entry.tool_calls[0].function.name}(
+          <code>{JSON.stringify(payload)}</code>)
+        </div>
+      )}
+      {entry.role === "tool" && (
+        <div>
+          {entry.name} {payload.success ? "success" : "error"}:{" "}
+          <code>{payload.success || payload.error}</code>
+        </div>
+      )}
     </div>
   );
 }

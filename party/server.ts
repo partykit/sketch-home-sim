@@ -86,7 +86,7 @@ export default class WorldServer implements Party.Server {
         // Check if the destination is a valid exit
         if (!robotLocation.exits.includes(args.destinationRoomId)) {
           return {
-            error: `Destination room with ID <${args.destinationRoomId}> is not adjacent to current room with ID <${currentLocation.id}>`,
+            error: `Destination room with ID <${args.destinationRoomId}> is not adjacent to current room with ID <${robotLocation.id}>`,
           };
         }
         // Move the robot
