@@ -23,10 +23,9 @@ export default function DebugLocation({
         background: isLit ? "#ffc" : "#cce",
       }}
     >
-      <h2>{location.name}</h2>
-      <p>
-        ID: <code>&lt;{location.id}&gt;</code>
-      </p>
+      <h2>
+        {location.name} <code>&lt;{location.id}&gt;</code>
+      </h2>
       <h4>Contents</h4>
       {location.contents.map((item) => (
         <p key={item.id}>
@@ -37,21 +36,23 @@ export default function DebugLocation({
           state: <code>{JSON.stringify(item.state)}</code>
         </p>
       ))}
-      <h4>Exits</h4>
-      <ul>
+      <p>
+        <strong>Exits:</strong>
         {location.exits.map((exit) => (
-          <li key={exit}>
+          <span key={exit}>
+            {" "}
             <code>&lt;{exit}&gt;</code>
-          </li>
+          </span>
         ))}
-      </ul>
+      </p>
       {moveableItems.length > 0 && (
         <>
-          <h4>Moveable Items</h4>
+          <h4>Also here</h4>
           <ul>
             {moveableItems.map((item) => (
               <li key={item.id}>
-                <strong>{item.name}</strong> <code>&lt;{item.id}&gt;</code>
+                <strong style={{ background: "white" }}>{item.name}</strong>{" "}
+                <code>&lt;{item.id}&gt;</code>
                 <br />
                 type: <code>{item.type}</code>
               </li>

@@ -109,13 +109,13 @@ export const DEFAULT_WORLD: World = {
       location: "hallway",
     },
     <MoveableItem>{
-      id: "dog",
-      name: "Dog",
+      id: "bruno",
+      name: "Bruno",
       type: "dog",
       location: "bedroom",
     },
     <MoveableItem>{
-      id: "person",
+      id: "sally",
       name: "Sally",
       type: "person",
       location: "office",

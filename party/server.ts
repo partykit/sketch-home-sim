@@ -122,9 +122,9 @@ export default class WorldServer implements Party.Server {
           success: `The robot is in ${robotLocation.name} (ID <${
             robotLocation.id
           }>). It can see: ${fixedItems
-            .map((i) => `${i.name} (ID <${i.id}>)`)
+            .map((i) => `${i.name} (ID <${i.id}>, type: ${i.type})`)
             .join(", ")}, ${movableItems
-            .map((i) => `${i.name} (ID <${i.id}>)`)
+            .map((i) => `${i.name} (ID <${i.id}>, type: ${i.type})`)
             .join(", ")}`,
         };
     }

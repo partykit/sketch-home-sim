@@ -62,18 +62,18 @@ export default class AssistantServer implements Party.Server {
       {
         role: "system",
         content:
-          "You are a helpful AI assistant controlling a smart home. You always know the layout of the home, the devices in it, and their current states. You do not know the position of moveable items such as people, animals, and objects that might be carried. You call functions to control the devices in the home.",
+          "You are a helpful AI assistant controlling a smart home. When the user refers to 'you' they either mean the entire home or the moveable robot that you control. You always know the layout of the home, the devices in it (which includes the robot), and their current states. You do not know the position of moveable items such as people, animals, and objects that might be carried, and you know even know their names initially. You can build your knowledge by using various devices. You call functions to control the devices in the home.",
       },
       {
         role: "system",
-        content: `The current state of the home follows. The state of devices is up to date with your most recent functions. You will have to consult the transcript for any other discoveries you have made:
+        content: `The current state of the home follows. The state of devices is up to date with your most recent functions. Consult the transcript for any other discoveries you have made:
         
         ${JSON.stringify(world, null, 2)}`,
       },
       {
         role: "system",
         content:
-          "The user's instruction follows. Your goal is to fulfil it to the best of your ability. It may take a sequence of many instructions to achieve your goal. At each step, call the best function to move you closer to your goal. When you're done, call the halt function.",
+          "The user's instruction follows. Your goal is to fulfil it to the best of your ability. It may take a sequence of many instructions to achieve your goal, and you may have to deliberately build knowledge so you know enough to reach the goal. At each step, call the best function to move you closer to your goal. When you're done, call the halt function.",
       },
       {
         role: "user",
@@ -115,15 +115,20 @@ export default class AssistantServer implements Party.Server {
       return;
     }
 
+    this.transcript = [
+      ...this.transcript,
+      {
+        role: "assistant",
+        content: `I have decided to call the function ${functionToCall.name} because: ${reasoning}`,
+      },
+    ];
+    this.broadcastSync();
+
     // Clarify any arguments for the function, and get the call itself
     const toolCallMessage = await getChatCompletionResponse({
       messages: [
         ...intro,
         ...this.transcript,
-        {
-          role: "assistant",
-          content: `I have decided to call the function ${functionToCall.name} because: ${reasoning}`,
-        },
         {
           role: "system",
           content:
@@ -140,6 +145,7 @@ export default class AssistantServer implements Party.Server {
 
     // Add the tool call to the transcript, before performing it
     this.transcript = [...this.transcript, toolCallMessage];
+    this.broadcastSync();
 
     // Abort without calling if the function is 'halt'
     if (functionToCall.name === "halt") {
@@ -175,6 +181,7 @@ export default class AssistantServer implements Party.Server {
         content: JSON.stringify(result, null, 2),
       },
     ];
+    this.broadcastSync();
   }
 }
 

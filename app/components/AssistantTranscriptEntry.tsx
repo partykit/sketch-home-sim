@@ -2,8 +2,10 @@ import type { OpenAIMessage } from "../../party/openai";
 
 export default function AssistantTranscriptEntry({
   entry,
+  index,
 }: {
   entry: OpenAIMessage;
+  index: number;
 }) {
   let payload = null;
   if (entry.role === "assistant" && entry.tool_calls) {
@@ -15,6 +17,7 @@ export default function AssistantTranscriptEntry({
   return (
     <div
       style={{
+        position: "relative",
         width: "100%",
         borderRadius: "0.25rem",
         border: "1px solid #cfc",
@@ -35,6 +38,20 @@ export default function AssistantTranscriptEntry({
       >
         {entry.role}
       </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "0.25rem",
+          right: "0.25rem",
+          fontWeight: "bold",
+          color: "#999",
+        }}
+      >
+        #{index + 1}
+      </div>
+      {entry.role === "assistant" && !entry.tool_calls && (
+        <div>{entry.content}</div>
+      )}
       {entry.role === "assistant" && entry.tool_calls && (
         <div>
           {entry.tool_calls[0].function.name}(

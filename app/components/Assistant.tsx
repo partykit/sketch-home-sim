@@ -1,6 +1,6 @@
 import { useState } from "react";
 import usePartySocket from "partysocket/react";
-import AssistantTranscriptEntry from "./AssistantTranscriptEntry";
+import AssistantTranscript from "./AssistantTranscript";
 
 // Another example is:
 // tell me where my dog is. you'll know it's my dog when you see it
@@ -55,6 +55,7 @@ export default function Debug() {
       style={{
         display: "flex",
         flexDirection: "column",
+        justifyContent: "stretch",
         gap: "2rem",
       }}
     >
@@ -81,35 +82,25 @@ export default function Debug() {
         <>
           <div>
             <h2>Interaction</h2>
-            {messageToUser !== null ? (
-              <p>
-                Assistant:{" "}
+            <p>
+              <strong>User:</strong> {assistant.instruction}
+            </p>
+            <p>
+              <strong>Assistant:</strong>{" "}
+              {messageToUser !== null ? (
                 <span style={{ color: "green" }}>{messageToUser}</span>
-              </p>
-            ) : (
-              <p>Working...</p>
-            )}
+              ) : (
+                <span>Working...</span>
+              )}
+            </p>
           </div>
-          <div>
+          <div style={{ flexGrow: 1 }}>
             <h2>Activity</h2>
             <p>
-              <strong>Instruction:</strong> {assistant?.instruction}
+              <strong>Tool calls remaining before cut-off:</strong>{" "}
+              {assistant.remaining}
             </p>
-            <p>
-              <strong>Loops remaining:</strong> {assistant?.remaining}
-            </p>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                width: "100%",
-              }}
-            >
-              {assistant?.transcript.map((entry: any) => (
-                <AssistantTranscriptEntry key={entry.id} entry={entry} />
-              ))}
-            </div>
+            <AssistantTranscript transcript={assistant.transcript} />
           </div>
         </>
       )}
