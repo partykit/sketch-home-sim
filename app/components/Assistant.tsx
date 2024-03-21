@@ -1,5 +1,6 @@
 import { useState } from "react";
 import usePartySocket from "partysocket/react";
+import AssistantTranscriptEntry from "./AssistantTranscriptEntry";
 
 // Another example is:
 // tell me where my dog is. you'll know it's my dog when you see it
@@ -53,18 +54,31 @@ export default function Debug() {
         />
         <button type="submit">Instruct</button>
       </form>
-      <div>
-        <h2>Assistant State</h2>
-        <pre
-          style={{
-            overflowX: "auto",
-            whiteSpace: "pre-wrap",
-            wordWrap: "break-word",
-          }}
-        >
-          {JSON.stringify(assistant, null, 2)}
-        </pre>
-      </div>
+      {assistant && (
+        <>
+          <div>
+            <h2>Assistant State</h2>
+            <p>
+              <strong>Instruction:</strong> {assistant?.instruction}
+            </p>
+            <p>
+              <strong>Loops remaining:</strong> {assistant?.remaining}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                width: "100%",
+              }}
+            >
+              {assistant?.transcript.map((entry: any) => (
+                <AssistantTranscriptEntry key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
