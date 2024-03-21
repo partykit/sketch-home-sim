@@ -2,6 +2,11 @@ import type * as Party from "partykit/server";
 import { intentFunction, allFunctions } from "./functions";
 import { getChatCompletionResponse } from "./openai";
 import type { OpenAIMessage } from "./openai";
+import type {
+  SyncMessage,
+  AskUserMessage,
+  AskUserResponseMessage,
+} from "./messages";
 
 const MAX_INSTRUCTIONS = 20;
 
@@ -10,6 +15,7 @@ export default class AssistantServer implements Party.Server {
   remaining = MAX_INSTRUCTIONS;
   transcript: OpenAIMessage[] = [];
   halt: boolean = false;
+  suspended: boolean = false;
 
   constructor(readonly room: Party.Room) {}
 
@@ -21,11 +27,29 @@ export default class AssistantServer implements Party.Server {
       this.transcript = [];
       this.halt = false;
       this.broadcastSync();
-      while (this.remaining > 0 && !this.halt) {
-        await this.tick();
-        this.remaining--;
-        this.broadcastSync();
+      await this.run();
+    } else if (data.type === "askUserResponse") {
+      if (this.suspended) {
+        this.transcript = [
+          ...this.transcript,
+          {
+            tool_call_id: data.toolCallId,
+            role: "tool",
+            name: "askUser",
+            content: JSON.stringify({ success: data.answer }),
+          },
+        ];
+        this.suspended = false;
+        await this.run();
       }
+    }
+  }
+
+  async run() {
+    while (this.remaining > 0 && !this.halt && !this.suspended) {
+      await this.tick();
+      this.remaining--;
+      this.broadcastSync();
     }
   }
 
@@ -90,6 +114,14 @@ export default class AssistantServer implements Party.Server {
           content:
             "You now have the opportunity to decide how best to respond. Choose which function will be best.",
         },
+        {
+          role: "user",
+          content:
+            "Which of these functions will best move you closer to your goal?\n\n" +
+            allFunctions
+              .map((f) => `- ${f.name} -- ${f.description}`)
+              .join("\n"),
+        },
       ],
       tool: intentFunction,
     });
@@ -147,13 +179,33 @@ export default class AssistantServer implements Party.Server {
     this.transcript = [...this.transcript, toolCallMessage];
     this.broadcastSync();
 
-    // Abort without calling if the function is 'halt'
-    if (functionToCall.name === "halt") {
-      this.halt = true;
-      return;
+    if (functionToCall.dispatchType === "LOCAL") {
+      // We need to handle the function right here, instead of calling the remote world simulator
+
+      // Abort without calling if the function is 'halt'
+      if (functionToCall.name === "halt") {
+        this.halt = true;
+        return;
+      }
+
+      if (functionToCall.name === "askUser") {
+        // If the function is 'askUser', we need to ask the user for input
+        // We'll need to handle this in a different way
+        this.room.broadcast(
+          JSON.stringify(<AskUserMessage>{
+            type: "askUser",
+            question: JSON.parse(
+              toolCallMessage.tool_calls[0].function.arguments
+            ).question,
+            toolCallId: toolCallMessage.tool_calls[0].id,
+          })
+        );
+        this.suspended = true;
+        return;
+      }
     }
 
-    // Go ahead and call the function otherwise
+    // It's a REMOTE dispatchType. Go ahead and call the function
 
     const toolCallArgs = JSON.parse(
       toolCallMessage.tool_calls[0].function.arguments

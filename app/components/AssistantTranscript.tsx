@@ -17,7 +17,11 @@ export default function AssistantTranscript({
       }}
     >
       {transcript.map((entry: any, index: number) => (
-        <AssistantTranscriptEntry key={entry.id} entry={entry} index={index} />
+        <AssistantTranscriptEntry
+          key={`entry-${index}`}
+          entry={entry}
+          index={index}
+        />
       ))}
     </div>
   );

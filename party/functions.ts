@@ -5,6 +5,7 @@ type OpenAIFunctionType = {
   name: string;
   description: string;
   schema: z.ZodObject<any, any>;
+  dispatchType: "REMOTE" | "LOCAL";
   getSignature: () => {
     name: string;
     description: string;
@@ -16,15 +17,18 @@ class OpenAIFunction implements OpenAIFunctionType {
   name: string;
   description: string;
   schema: z.ZodObject<any, any>;
+  dispatchType: "REMOTE" | "LOCAL";
 
   constructor(
     name: string,
     description: string,
-    schema: z.ZodObject<any, any>
+    schema: z.ZodObject<any, any>,
+    dispatchType: "REMOTE" | "LOCAL"
   ) {
     this.name = name;
     this.description = description;
     this.schema = schema;
+    this.dispatchType = dispatchType;
   }
 
   getSignature() {
@@ -32,6 +36,7 @@ class OpenAIFunction implements OpenAIFunctionType {
       name: this.name,
       description: this.description,
       parameters: zodToJsonSchema(this.schema, { target: "openApi3" }),
+      dispatchType: this.dispatchType,
     };
   }
 }
@@ -43,7 +48,8 @@ const toggleLightFunction = new OpenAIFunction(
     .object({
       lightId: z.string().describe("ID of the light to toggle"),
     })
-    .describe("Toggle light")
+    .describe("Toggle light"),
+  "REMOTE"
 );
 
 const moveRobotFunction = new OpenAIFunction(
@@ -55,13 +61,22 @@ const moveRobotFunction = new OpenAIFunction(
         .string()
         .describe("ID of the adjacent room to move the robot to"),
     })
-    .describe("Move robot")
+    .describe("Move robot"),
+  "REMOTE"
 );
 
 const lookWithRobotFunction = new OpenAIFunction(
   "lookWithRobot",
   "Look into the robot's current room, returning the fixed and moving items (only if the room is light).",
-  z.object({}).describe("List the contents of the room the robot is in")
+  z.object({}).describe("List the contents of the room the robot is in"),
+  "REMOTE"
+);
+
+const askUserFunction = new OpenAIFunction(
+  "askUser",
+  "Ask the user a question. Use this to get more information or clarify something. Only use this as a last resort",
+  z.object({ question: z.string() }).describe("The question to ask the user"),
+  "LOCAL"
 );
 
 const haltFunction = new OpenAIFunction(
@@ -73,7 +88,8 @@ const haltFunction = new OpenAIFunction(
         .string()
         .describe("Report back to the user with a message"),
     })
-    .describe("Stop operations and report back to the user")
+    .describe("Stop operations and report back to the user"),
+  "LOCAL"
 );
 
 export const intentFunction = new OpenAIFunction(
@@ -87,15 +103,18 @@ export const intentFunction = new OpenAIFunction(
         toggleLightFunction.name,
         moveRobotFunction.name,
         lookWithRobotFunction.name,
+        askUserFunction.name,
         haltFunction.name,
       ]),
     })
-    .describe("Function to call")
+    .describe("Function to call"),
+  "LOCAL"
 );
 
 export const allFunctions = [
   toggleLightFunction,
   moveRobotFunction,
   lookWithRobotFunction,
+  askUserFunction,
   haltFunction,
 ];

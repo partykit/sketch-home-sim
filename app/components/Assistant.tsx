@@ -17,6 +17,14 @@ export default function Debug() {
       const data = JSON.parse(evt.data);
       if (data.type === "sync") {
         setAssistant(data.state);
+      } else if (data.type === "askUser") {
+        socket.send(
+          JSON.stringify({
+            type: "askUserResponse",
+            toolCallId: data.toolCallId,
+            answer: prompt(data.question),
+          })
+        );
       }
     },
   });
@@ -102,6 +110,26 @@ export default function Debug() {
             </p>
             <AssistantTranscript transcript={assistant.transcript} />
           </div>
+          <details>
+            <summary
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: "bold",
+                marginBottom: "1rem",
+              }}
+            >
+              Transcript [debug]
+            </summary>
+            <pre
+              style={{
+                fontSize: "0.85rem",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+              }}
+            >
+              {JSON.stringify(assistant.transcript, null, 2)}
+            </pre>
+          </details>
         </>
       )}
     </div>
