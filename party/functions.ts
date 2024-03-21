@@ -86,7 +86,9 @@ const haltFunction = new OpenAIFunction(
     .object({
       messageToUser: z
         .string()
-        .describe("Report back to the user with a message"),
+        .describe(
+          "Report back to the user with a message. Never use this to ask for more information."
+        ),
     })
     .describe("Stop operations and report back to the user"),
   "LOCAL"
