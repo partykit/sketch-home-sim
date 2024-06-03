@@ -3,7 +3,6 @@ import DebugLocation from "./DebugLocation";
 export default function DebugWorld({ world }: { world: World | null }) {
   return (
     <div>
-      <h2>World</h2>
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
         {world?.locations.map((location) => (
           <DebugLocation
@@ -15,6 +14,10 @@ export default function DebugWorld({ world }: { world: World | null }) {
           />
         ))}
       </div>
+      <details style={{ display: "none" }}>
+        <summary>Debug</summary>
+        <pre>{JSON.stringify(world, null, 2)}</pre>
+      </details>
     </div>
   );
 }

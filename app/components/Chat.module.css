@@ -1,0 +1,29 @@
+.listItem {
+  display: flex;
+  justify-content: start;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.listItem.reversed {
+  justify-content: end;
+  flex-direction: row-reverse;
+}
+
+.user {
+  border-radius: 50%;
+  background-color: lightblue;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+}
+
+.message {
+  border-radius: 0.5rem;
+  background-color: rgb(231, 229, 228);
+  padding: 0.25rem 0.5rem;
+  max-width: calc(100% - 7rem);
+}

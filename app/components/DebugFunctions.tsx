@@ -53,12 +53,13 @@ export default function DebugFunctions({
     <details>
       <summary
         style={{
-          fontSize: "1.25rem",
-          fontWeight: "bold",
+          fontSize: "1rem",
+          fontWeight: "medium",
           marginBottom: "1rem",
+          opacity: 0.5,
         }}
       >
-        Functions
+        Debug: Manual function caller
       </summary>
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <form

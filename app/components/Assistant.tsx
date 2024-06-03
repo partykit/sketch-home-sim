@@ -65,64 +65,89 @@ export default function Debug() {
         flexDirection: "column",
         justifyContent: "stretch",
         gap: "2rem",
+        backgroundColor: "#fff",
       }}
     >
-      <h1>Assistant</h1>
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          display: "flex",
-          justifyContent: "stretch",
-          gap: "0.5rem",
-          width: "100%",
-        }}
-      >
-        <input
-          type="text"
-          name="instruction"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          style={{ flex: 1 }}
-        />
-        <button type="submit">Instruct</button>
-      </form>
-      {!assistant && (
-        <div>
-          <h2>Try these examples</h2>
-          <ul>
-            <li>turn on the light in the kitchen</li>
-            <li>turn off all the lights</li>
-            <li>turn on the light for sally</li>
-            <li>find my dog</li>
-            <li>turn the lights in the office to something appropriate</li>
-          </ul>
-        </div>
-      )}
-      {assistant && (
+      <h1>Agent</h1>
+      {!assistant?.instruction && (
         <>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              justifyContent: "stretch",
+              gap: "0.5rem",
+              width: "100%",
+              fontSize: "1.25rem",
+            }}
+          >
+            <input
+              type="text"
+              name="instruction"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <button type="submit">Instruct</button>
+          </form>
           <div>
-            <h2>Interaction</h2>
-            <p>
-              <strong>User:</strong> {assistant.instruction}
-            </p>
-            <p>
-              <strong>Assistant:</strong>{" "}
+            <h2>Try these examples</h2>
+            <ul>
+              <li>turn on the light in the kitchen</li>
+              <li>turn off all the lights</li>
+              <li>turn on the light for sally</li>
+              <li>find my dog</li>
+              <li>turn the lights in the office to something appropriate</li>
+            </ul>
+          </div>
+        </>
+      )}
+      {assistant?.instruction && (
+        <>
+          <div
+            style={{
+              fontSize: "1.25rem",
+              backgroundColor: "#eee",
+              padding: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "start",
+              alignItems: "start",
+              gap: "0.5rem",
+            }}
+          >
+            <div>
+              <strong>User</strong>
+              <br />
+              {assistant.instruction}
+            </div>
+            <div>
+              <strong>Agent</strong>
+              <br />
               {messageToUser !== null ? (
-                <span style={{ color: "green" }}>{messageToUser}</span>
+                <span style={{ backgroundColor: "#86efac" }}>
+                  {messageToUser}
+                </span>
               ) : (
-                <span>Working...</span>
+                <span>
+                  <i>Working...</i>
+                </span>
               )}
-            </p>
+            </div>
             {messageToUser && (
-              <p>
+              <div>
                 <a
                   href="#"
-                  style={{ color: "blue", textDecoration: "underline" }}
+                  style={{
+                    color: "#666",
+                    textDecoration: "underline",
+                    fontSize: "1rem",
+                  }}
                   onClick={() => setAssistant(null)}
                 >
                   Reset
                 </a>
-              </p>
+              </div>
             )}
           </div>
           <div style={{ flexGrow: 1 }}>
@@ -136,9 +161,9 @@ export default function Debug() {
           <details>
             <summary
               style={{
-                fontSize: "1.25rem",
-                fontWeight: "bold",
+                fontSize: "1rem",
                 marginBottom: "1rem",
+                opacity: 0.5,
               }}
             >
               Transcript [debug]

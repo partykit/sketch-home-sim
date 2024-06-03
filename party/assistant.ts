@@ -7,17 +7,22 @@ import type {
   AskUserMessage,
   AskUserResponseMessage,
 } from "./messages";
+import { TEST_INSTRUCTION, TEST_TRANSCRIPT } from "./test";
 
 const MAX_INSTRUCTIONS = 20;
 
 export default class AssistantServer implements Party.Server {
-  instruction: string | null = null;
+  instruction: string | null = null; //TEST_INSTRUCTION;
   remaining = MAX_INSTRUCTIONS;
-  transcript: OpenAIMessage[] = [];
+  transcript: OpenAIMessage[] = []; //TEST_TRANSCRIPT;
   halt: boolean = false;
   suspended: boolean = false;
 
   constructor(readonly room: Party.Room) {}
+
+  onConnect(conn: Party.Connection) {
+    this.broadcastSync();
+  }
 
   async onMessage(message: string, conn: Party.Connection) {
     const data = JSON.parse(message);

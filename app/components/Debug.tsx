@@ -20,10 +20,17 @@ export default function Debug() {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-      <h1>Debug</h1>
-      <DebugFunctions host={socket.host} room={DEFAULT_ROOM} />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+        backgroundColor: "#eee",
+      }}
+    >
+      <h1>World</h1>
       <DebugWorld world={world} />
+      <DebugFunctions host={socket.host} room={DEFAULT_ROOM} />
     </div>
   );
 }
